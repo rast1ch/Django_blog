@@ -1,7 +1,46 @@
 {% extends 'blog/_base.html' %}
+{% load blog_tags %}
 {% block title %}{{post.title}}{% endblock title %}
 {% block content %}
-    <h1>{{post.title}}</h1>
+    <h1><a href="{% url 'blog:post_list' %}"> Main</a> < {{post.title}}</h1>
     <p class = "date">Published {{post.publish}} by {{post.author}}</p>
-    {{post.body|linebreaks}}
+    <p class="tags">
+    {% for tag in post.tags.all %}
+        <a href="{%url 'blog:post_list_by_tag' tag.slug%}">
+        {{tag.name}}
+        </a>
+        {% if not forloop.last %}, {% endif %}
+    {% endfor %}
+    </p>
+    <p class="post">{{post.body|markdown}}</p>
+<br>
+{%if similar_posts%}
+<h2>Similar posts</h2>
+{%for sim_post in similar_posts%}
+    <a href="{{sim_post.get_absolute_url}}">{{sim_post.title}}</a>
+{%endfor%}
+{%endif%}
+{% with comments.count as total_comments %}
+<h2>{{total_comments}} comment{{total_comments|pluralize}}</h2>
+{% endwith %}
+<br>
+{% for comment in comments %}
+    <div class="comment">
+        <p class="info">{{comment.name}}
+        {{comment.created}}</p>
+        <p>{{comment.body|linebreaks}}<p>
+    </div>
+    {%empty%}
+    <p>There are no comments yet.</p>
+{% endfor %}
+{% if new_comment %}
+<h2>Comment added succesfully</h2>
+{% else %}
+    <h2>Add new comment</h2>
+    <form action="." method="post">
+        {{comment_form.as_p}}
+        {% csrf_token %}
+        <p><input type="submit" value="Add comment"></p>
+        </form>
+{% endif %}
 {% endblock content %}

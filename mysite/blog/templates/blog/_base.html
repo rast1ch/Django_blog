@@ -17,6 +17,7 @@
         <h3>Show latest posts</h3>
         {%show_lastest 3%}
         <h3>The most commented posts</h3>
+        <h4><a href="{%url 'blog:post_feed'%}">Subscribe to my RSS feed!</a></h4>
         <ul>
         {%the_most_commented as most_commented%}
             {% for post in most_commented %}
